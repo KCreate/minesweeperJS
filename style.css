@@ -1,0 +1,76 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+#app {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.row {
+    display: block;
+    overflow: auto;
+}
+
+.tile {
+    width: 40px;
+    height: 40px;
+    float: left;
+    background-color: gray;
+    border: 1px solid black;
+    text-align: center;
+    line-height: 40px;
+    font-size: 25px;
+}
+
+.tile.flagged {
+    background-color: gold;
+    position: relative;
+}
+
+.tile.flagged::after {
+    display: block;
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border-radius: 50%;
+}
+
+.tile.bomb {
+    background-color: gold;
+}
+
+.tile.bombs-0.open {
+    background-color: white;
+}
+.tile.bombs-1.open {
+    background-color: lightblue;
+}
+.tile.bombs-2.open {
+    background-color: lightgreen;
+}
+.tile.bombs-3.open {
+    background-color: violet;
+}
+.tile.bombs-4.open {
+    background-color: yellow;
+}
+.tile.bombs-5.open {
+    background-color: purple;
+}
+.tile.bombs-6.open {
+    background-color: brown;
+}
+.tile.bombs-7.open {
+    background-color: red;
+}
+.tile.bombs-8.open {
+    background-color: black;
+    color: white;
+}
