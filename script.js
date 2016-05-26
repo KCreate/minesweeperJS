@@ -82,7 +82,7 @@ var Minesweeper = function() {
 
             // Tile methods
             this.leftClick = (event) => {
-                if (this.bomb) {
+                if (this.bomb && !this.flagged) {
                     this.game.loose();
                 } else {
                     this.bombsAround = this.game.bombsForField(this.x, this.y);
