@@ -72,7 +72,7 @@ var Minesweeper = function() {
         this.field = this.field.map((row, y) => row.map((tile, x) => (new (function(game) {
 
             // Properties
-            this.bomb = !Math.floor(Math.random() * 7);
+            this.bomb = !Math.floor(Math.random() * 5);
             this.bombsAround = 0;
             this.flagged = false;
             this.open = false;
