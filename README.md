@@ -1,4 +1,7 @@
 # Minesweeper in javascript
+
+[Play the game here](https://rawgit.com/KCreate/minesweeperJS/master/index.html)
+
 ![](example.png)
 
 # License
