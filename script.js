@@ -15,11 +15,23 @@ function undefinedArray(length, value) {
     return array;
 };
 
+var fieldModifiers = [
+    [-1, -1],
+    [0, -1],
+    [1, -1],
+    [-1, 0],
+    [1, 0],
+    [-1, 1],
+    [0, 1],
+    [1, 1],
+];
+
 var Minesweeper = function() {
 
     // Properties
     this.field = [];
     this.renderTarget = undefined;
+    this.difficulty = 4;
 
     // Get amount of bombs in radius of 3x3
     this.bombsForField = function(x, y) {
@@ -39,17 +51,6 @@ var Minesweeper = function() {
             return 0;
         }
 
-        var fieldModifiers = [
-            [-1, -1],
-            [0, -1],
-            [1, -1],
-            [-1, 0],
-            [1, 0],
-            [-1, 1],
-            [0, 1],
-            [1, 1],
-        ];
-
         var amountOfBombs = 0;
         fieldModifiers.forEach((mod) => {
             if (this.field[y + mod[1]]) {
@@ -65,14 +66,17 @@ var Minesweeper = function() {
     }
 
     // Configure method
-    this.configure = function({ fieldSize, renderTarget }) {
+    this.configure = function({ fieldSize, renderTarget, difficulty }) {
+
+        // Set difficulty
+        this.difficulty = difficulty;
 
         // Construct the field
         this.field = undefinedArray(fieldSize.y, undefinedArray(fieldSize.x, undefined));
         this.field = this.field.map((row, y) => row.map((tile, x) => (new (function(game) {
 
             // Properties
-            this.bomb = !Math.floor(Math.random() * 5);
+            this.bomb = !Math.floor(Math.random() * Math.sqrt(game.difficulty * 2));
             this.bombsAround = 0;
             this.flagged = false;
             this.open = false;
@@ -82,10 +86,44 @@ var Minesweeper = function() {
 
             // Tile methods
             this.leftClick = (event) => {
+
+                var initial = false;
+                if (!window.alreadyModified) {
+                    initial = true;
+                    window.alreadyModified = [];
+                }
+
+                // If this block was already checked, skip
+                if (window.alreadyModified.indexOf(this.x + '-' + this.y) === -1) {
+
+                    // If there are no bombs around this field, click on all of the neighbour fields
+                    if (this.bombsAround === 0 && !this.bomb) {
+
+                        // Iterate over field modifier
+                        fieldModifiers.forEach((mod) => {
+
+                            // Check if the block exists
+                            if (this.game.field[this.y + mod[1]]) {
+                                if (this.game.field[this.y + mod[1]][this.x + mod[0]]) {
+
+                                    // Add this block to the already checked blocks list
+                                    window.alreadyModified.push(this.x + '-' + this.y);
+
+                                    // Click the field
+                                    this.game.field[this.y + mod[1]][this.x + mod[0]].leftClick({});
+                                }
+                            }
+                        });
+                    }
+                }
+
+                if (initial) {
+                    window.alreadyModified = undefined;
+                }
+
                 if (this.bomb && !this.flagged) {
                     this.game.loose();
-                } else {
-                    this.bombsAround = this.game.bombsForField(this.x, this.y);
+                } else if (!this.flagged) {
                     this.open = true;
                     this.flagged = false;
                     this.game.render();
@@ -100,6 +138,10 @@ var Minesweeper = function() {
                 }
             };
         })(this))));
+
+        this.field = this.field.map((row, y) => row.map((tile, x) => Object.assign(tile, {
+            bombsAround: this.bombsForField(x, y),
+        })));
 
         // Render target
         this.renderTarget = renderTarget;
@@ -159,16 +201,28 @@ var Minesweeper = function() {
     };
 };
 
-function loadGame() {
+function loadGame(configure) {
     var game = new Minesweeper();
-    game.configure({
+    game.configure(configure || {
         fieldSize: {
-            x: 30,
+            x: 20,
             y: 15,
         },
+        difficulty: Number(document.getElementById('difficultySelector').value),
         renderTarget: document.getElementById('app')
     });
     game.render();
 }
 
 loadGame();
+
+document.getElementById('difficultySelector').onchange = function(event) {
+    loadGame({
+        fieldSize: {
+            x: 20,
+            y: 15,
+        },
+        difficulty: Number(event.target.value),
+        renderTarget: document.getElementById('app')
+    });
+};
